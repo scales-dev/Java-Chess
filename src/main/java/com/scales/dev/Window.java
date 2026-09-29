@@ -18,10 +18,14 @@ public class Window extends JFrame {
 
     this.createBufferStrategy(3);
     bs = this.getBufferStrategy();
+
+    this.addMouseListener(new MouseListener());
   }
 
   public Graphics2D start() {
-    return (Graphics2D) bs.getDrawGraphics();
+    Graphics2D g = (Graphics2D) bs.getDrawGraphics();
+    g.clearRect(0, 0, this.getWidth(), this.getHeight());
+    return g;
   }
 
   public void finish(Graphics2D g) {
