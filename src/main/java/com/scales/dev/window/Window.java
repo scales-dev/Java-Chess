@@ -12,26 +12,26 @@ public class Window extends JFrame {
   public Window() {
     super("Speed Chess");
 
-    this.pack();
-    Insets insets = this.getInsets();
-
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     this.setResizable(false);
-    this.setBackground(Color.BLACK);
-    this.setSize(
-        Board.RENDER_SIZE + insets.left + insets.right,
-        Board.RENDER_SIZE + insets.top + insets.bottom);
-    this.setLocationRelativeTo(null);
     this.setVisible(true);
 
-    this.createBufferStrategy(3);
-    bs = this.getBufferStrategy();
+    Canvas canvas = new Canvas();
+    canvas.setPreferredSize(new Dimension(Board.RENDER_SIZE, Board.RENDER_SIZE));
+    canvas.setIgnoreRepaint(true);
 
-    this.addMouseListener(new MouseListener());
-    this.addComponentListener(new ComponentListener());
+    this.add(canvas, BorderLayout.CENTER);
+    this.pack();
+    this.setLocationRelativeTo(null);
+
+    canvas.createBufferStrategy(3);
+    bs = canvas.getBufferStrategy();
+
+    canvas.addMouseListener(new MouseListener());
   }
 
   public Graphics2D start() {
+    Toolkit.getDefaultToolkit().sync();
     Graphics2D g = (Graphics2D) bs.getDrawGraphics();
     // g.clearRect(0, 0, this.getWidth(), this.getHeight());
     g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
@@ -40,7 +40,12 @@ public class Window extends JFrame {
 
   public void finish(Graphics2D g) {
     g.dispose();
-    bs.show();
+
+    // a rare time when i actually use "do"!!!
+    do {
+      bs.show();
+    } while (bs.contentsRestored());
+
     Toolkit.getDefaultToolkit().sync();
   }
 }

@@ -9,5 +9,6 @@ public class Main {
   @Getter private static final Board board = new Board();
 
   static void main() {
+    Main.getBoard().draw();
   }
 }
