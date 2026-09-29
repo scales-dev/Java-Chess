@@ -25,6 +25,7 @@ public class Window extends JFrame {
   public Graphics2D start() {
     Graphics2D g = (Graphics2D) bs.getDrawGraphics();
     g.clearRect(0, 0, this.getWidth(), this.getHeight());
+    g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
     return g;
   }
 
