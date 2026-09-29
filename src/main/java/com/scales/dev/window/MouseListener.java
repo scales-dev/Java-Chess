@@ -14,10 +14,11 @@ public class MouseListener extends MouseAdapter {
     Rectangle boardRectangle = board.getBoardRectangle();
     if (!boardRectangle.contains(e.getX(), e.getY())) return;
 
-    int x =
-        (int) (((float) (e.getX() - boardRectangle.x) / boardRectangle.width) * Board.BOARD_SIZE);
-    int y =
-        (int) (((float) (e.getY() - boardRectangle.y) / boardRectangle.height) * Board.BOARD_SIZE);
+    float xRatio = (float) (e.getX() - boardRectangle.x) / boardRectangle.width;
+    float yRatio = (float) (e.getY() - boardRectangle.y) / boardRectangle.height;
+
+    int x = (int) (xRatio * Board.BOARD_SIZE);
+    int y = (int) (yRatio * Board.BOARD_SIZE);
 
     board.setSelectedPiece(board.pieces[x][y]);
 

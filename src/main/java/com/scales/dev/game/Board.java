@@ -7,13 +7,12 @@ import lombok.Setter;
 
 public class Board {
   public static final int BOARD_SIZE = 8;
-  private static final Color WHITE_SQUARE = new Color(238, 238, 210);
-  private static final Color BLACK_SQUARE = new Color(118, 150, 86);
-  private static final Color SELECTED_SQUARE = new Color(186, 202, 68);
+  public static final int RENDER_SIZE = 512;
+  private static final Color WHITE_SQUARE = new Color(238, 238, 210, 50);
+  private static final Color BLACK_SQUARE = new Color(118, 150, 86, 50);
   public final Piece[][] pieces = new Piece[BOARD_SIZE][BOARD_SIZE];
   @Setter private Piece selectedPiece;
-
-  private static final int RENDER_SIZE = 512;
+  private static final Color SELECTED_SQUARE = new Color(186, 202, 68, 50);
   private static final int SQUARE_SIZE = RENDER_SIZE / BOARD_SIZE;
 
   private static final String DEFAULT_POSITION = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
@@ -54,11 +53,9 @@ public class Board {
   }
 
   public void draw() {
-    Window frame = Main.getFrame();
     Graphics2D g = Main.getFrame().start();
 
     Rectangle boardRectangle = getBoardRectangle();
-
     g.translate(boardRectangle.x, boardRectangle.y);
 
     for (int x = 0; x < BOARD_SIZE; x++) {
@@ -88,9 +85,6 @@ public class Board {
   public Rectangle getBoardRectangle() {
     Window frame = Main.getFrame();
     return new Rectangle(
-        (frame.getWidth() / 2) - (RENDER_SIZE / 2),
-        (frame.getHeight() / 2) - (RENDER_SIZE / 2),
-        RENDER_SIZE,
-        RENDER_SIZE);
+        frame.getInsets().left + 1, frame.getInsets().top, RENDER_SIZE, RENDER_SIZE);
   }
 }
