@@ -1,4 +1,4 @@
-package com.scales.dev;
+package com.scales.dev.game;
 
 public enum PieceTypes {
   King,

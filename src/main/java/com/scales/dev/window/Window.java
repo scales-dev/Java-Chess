@@ -1,4 +1,4 @@
-package com.scales.dev;
+package com.scales.dev.window;
 
 import java.awt.*;
 import java.awt.image.BufferStrategy;
@@ -8,7 +8,7 @@ import javax.swing.*;
 public class Window extends JFrame {
   public BufferStrategy bs;
 
-  protected Window() {
+  public Window() {
     super("Speed Chess");
 
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

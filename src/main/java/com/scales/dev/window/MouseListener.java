@@ -1,5 +1,6 @@
-package com.scales.dev;
+package com.scales.dev.window;
 
+import com.scales.dev.Main;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 

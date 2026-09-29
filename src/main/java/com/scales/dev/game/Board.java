@@ -1,5 +1,7 @@
-package com.scales.dev;
+package com.scales.dev.game;
 
+import com.scales.dev.Main;
+import com.scales.dev.window.Window;
 import java.awt.*;
 
 public class Board {

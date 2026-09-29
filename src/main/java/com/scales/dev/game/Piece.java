@@ -1,5 +1,6 @@
-package com.scales.dev;
+package com.scales.dev.game;
 
+import com.scales.dev.Main;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
