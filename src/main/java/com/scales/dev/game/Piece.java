@@ -19,6 +19,7 @@ public class Piece {
 
   public long lastMoved = -1;
   public int timesMoved = 0;
+  public Square lastDistance = new Square(0, 0);
 
   public Square position;
 

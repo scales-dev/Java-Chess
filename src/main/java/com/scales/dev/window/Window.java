@@ -14,7 +14,6 @@ public class Window extends JFrame {
 
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     this.setResizable(false);
-    this.setVisible(true);
 
     Canvas canvas = new Canvas();
     canvas.setPreferredSize(new Dimension(Board.RENDER_SIZE, Board.RENDER_SIZE));
@@ -28,6 +27,8 @@ public class Window extends JFrame {
     bs = canvas.getBufferStrategy();
 
     canvas.addMouseListener(new MouseListener());
+
+    this.setVisible(true);
   }
 
   public Graphics2D start() {
@@ -41,11 +42,7 @@ public class Window extends JFrame {
 
   public void finish(Graphics2D g) {
     g.dispose();
-
-    do {
-      bs.show();
-    } while (bs.contentsRestored());
-
+    bs.show();
     Toolkit.getDefaultToolkit().sync();
   }
 }

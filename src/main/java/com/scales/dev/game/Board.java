@@ -21,6 +21,16 @@ public class Board {
 
   private static final String DEFAULT_POSITION = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 
+  private final Piece[] lastMovePerTeam = new Piece[2];
+
+  public Piece getLastMove(boolean white) {
+    return lastMovePerTeam[white ? 0 : 1];
+  }
+
+  public void setLastMove(Piece piece) {
+    lastMovePerTeam[piece.WHITE ? 0 : 1] = piece;
+  }
+
   public Board() {
     loadFenNotation(DEFAULT_POSITION);
   }
@@ -97,6 +107,10 @@ public class Board {
     }
 
     frame.finish(g);
+  }
+
+  public Piece getPiece(Square square) {
+    return pieces[square.x()][square.y()];
   }
 
   private Color getSquareColor(int x, int y, Piece piece) {

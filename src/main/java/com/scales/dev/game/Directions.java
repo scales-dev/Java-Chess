@@ -14,4 +14,13 @@ public enum Directions {
   NORTH_WEST(new Square(-1, 1));
 
   public final Square vector;
+
+  public Directions rotateClockwise() {
+    return Directions.values()[(this.ordinal() + 1) % Directions.values().length];
+  }
+
+  public Directions rotateCounterClockwise() {
+    return Directions.values()[
+        (this.ordinal() - 1 + Directions.values().length) % Directions.values().length];
+  }
 }

@@ -57,6 +57,9 @@ public enum PieceTypes {
       return squares;
     }
   },
+  // honestly the pawn should be handled completely separately, hes so weird
+  // todo: make en passant take the piece
+  //  promotion
   Pawn {
     @Override
     public ArrayList<Square> getValidSquares(Piece piece) {
@@ -69,28 +72,64 @@ public enum PieceTypes {
         addPossibleMove(piece, piece.position.offset(direction, 2), squares);
       }
 
+      Board board = Main.getBoard();
+
+      // en passant
+      for (Directions d : new Directions[] {Directions.EAST, Directions.WEST}) {
+        Square square = piece.position.offset(d);
+        if (notContainsEnemy(piece, square)) continue;
+
+        Piece enPassantPiece = board.getPiece(square);
+        if (board.getLastMove(!piece.WHITE) != enPassantPiece
+            || enPassantPiece.timesMoved != 1
+            || enPassantPiece.TYPE != PieceTypes.Pawn
+            || enPassantPiece.lastDistance.sum() != 2) continue;
+
+        addPossibleMove(piece, square.offset(direction), squares);
+      }
+
+      // taking normally
+      for (Directions d :
+          new Directions[] {direction.rotateClockwise(), direction.rotateCounterClockwise()}) {
+        Square square = piece.position.offset(d);
+        if (notContainsEnemy(piece, square)) continue;
+        addPossibleMove(piece, square, squares);
+      }
+
       return squares;
     }
   };
 
   public abstract ArrayList<Square> getValidSquares(Piece piece);
 
-  protected boolean isValidSquare(Piece piece, Square position) {
-    Piece[][] boardSquare = Main.getBoard().pieces;
+  protected boolean isInvalidSquare(Square position) {
+    Board board = Main.getBoard();
 
-    if (position.x() < 0
-        || position.x() >= boardSquare.length
+    return position.x() < 0
+        || position.x() >= board.pieces.length
         || position.y() < 0
-        || position.y() >= boardSquare[0].length) return false;
+        || position.y() >= board.pieces[0].length;
+  }
 
-    Piece pieceAtPosition = boardSquare[position.x()][position.y()];
+  protected boolean containsFriend(Piece piece, Square position) {
+    if (isInvalidSquare(position)) return false;
 
-    return pieceAtPosition == null || piece.WHITE != pieceAtPosition.WHITE;
+    Piece pieceAtPosition = Main.getBoard().getPiece(position);
+
+    return pieceAtPosition != null && piece.WHITE == pieceAtPosition.WHITE;
+  }
+
+  protected boolean notContainsEnemy(Piece piece, Square position) {
+    if (isInvalidSquare(position)) return true;
+
+    Piece pieceAtPosition = Main.getBoard().getPiece(position);
+
+    return pieceAtPosition == null || piece.WHITE == pieceAtPosition.WHITE;
   }
 
   protected boolean addPossibleMove(
       Piece piece, Square finalPosition, ArrayList<Square> possibleMoves) {
-    if (!isValidSquare(piece, finalPosition)) return false;
+    if (isInvalidSquare(finalPosition) || containsFriend(piece, finalPosition)) return false;
     possibleMoves.add(finalPosition);
 
     return true;

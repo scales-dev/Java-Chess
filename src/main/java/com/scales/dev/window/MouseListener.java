@@ -30,6 +30,7 @@ public class MouseListener extends MouseAdapter {
     board.draw();
   }
 
+  // todo: move
   private boolean movePiece(Board board, Piece piece, Square position) {
     if (piece != null) {
       ArrayList<Square> possibleMoves = piece.TYPE.getValidSquares(piece);
@@ -39,9 +40,16 @@ public class MouseListener extends MouseAdapter {
         // move from old position
         board.pieces[currentPosition.x()][currentPosition.y()] = null;
 
+        // update piece data
+        piece.timesMoved++;
+        piece.lastMoved = System.currentTimeMillis();
+        piece.lastDistance = piece.position.difference(position);
+
         // move to new position, replacing whatever was there
         board.pieces[position.x()][position.y()] = piece;
         piece.position = position;
+
+        board.setLastMove(piece);
 
         // we dont wanna stay selecting the same piece </3
         board.selectedPiece = null;
