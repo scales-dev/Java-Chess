@@ -17,11 +17,18 @@ public class Piece {
 
   public final BufferedImage ICON;
 
-  public Piece(PieceTypes piece, boolean white) {
+  public long lastMoved = -1;
+  public int timesMoved = 0;
+
+  public Square position;
+
+  public Piece(PieceTypes piece, boolean white, Square position) {
     this.TYPE = piece;
     this.WHITE = white;
 
     this.ICON = this.getIcon();
+
+    this.position = position;
   }
 
   private String getImagePath() {

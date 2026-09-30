@@ -24,7 +24,7 @@ public class Window extends JFrame {
     this.pack();
     this.setLocationRelativeTo(null);
 
-    canvas.createBufferStrategy(3);
+    canvas.createBufferStrategy(2);
     bs = canvas.getBufferStrategy();
 
     canvas.addMouseListener(new MouseListener());
@@ -35,13 +35,13 @@ public class Window extends JFrame {
     Graphics2D g = (Graphics2D) bs.getDrawGraphics();
     // g.clearRect(0, 0, this.getWidth(), this.getHeight());
     g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     return g;
   }
 
   public void finish(Graphics2D g) {
     g.dispose();
 
-    // a rare time when i actually use "do"!!!
     do {
       bs.show();
     } while (bs.contentsRestored());

@@ -3,17 +3,21 @@ package com.scales.dev.game;
 import com.scales.dev.Main;
 import com.scales.dev.window.Window;
 import java.awt.*;
-import lombok.Setter;
+import java.awt.geom.AffineTransform;
 
 public class Board {
   public static final int BOARD_SIZE = 8;
   public static final int RENDER_SIZE = 512;
+  private static final int SQUARE_SIZE = RENDER_SIZE / BOARD_SIZE;
+  private static final int VALID_MOVES_SIZE = (int) (SQUARE_SIZE / 2.5f);
+  private static final int VALID_MOVE_OFFSET = (SQUARE_SIZE / 2) - (VALID_MOVES_SIZE / 2);
+
   private static final Color WHITE_SQUARE = new Color(238, 238, 210);
   private static final Color BLACK_SQUARE = new Color(118, 150, 86);
-  public final Piece[][] pieces = new Piece[BOARD_SIZE][BOARD_SIZE];
-  @Setter private Piece selectedPiece;
   private static final Color SELECTED_SQUARE = new Color(186, 202, 68);
-  private static final int SQUARE_SIZE = RENDER_SIZE / BOARD_SIZE;
+
+  public final Piece[][] pieces = new Piece[BOARD_SIZE][BOARD_SIZE];
+  public Piece selectedPiece;
 
   private static final String DEFAULT_POSITION = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 
@@ -47,7 +51,8 @@ public class Board {
               default -> throw new RuntimeException("Invalid piece: " + c);
             };
 
-        pieces[x++][y] = new Piece(type, white);
+        pieces[x][y] = new Piece(type, white, new Square(x, y));
+        x++;
       }
     }
   }
@@ -58,6 +63,8 @@ public class Board {
 
     Rectangle boardRectangle = getBoardRectangle();
     g.translate(boardRectangle.x, boardRectangle.y);
+
+    AffineTransform defaultTransform = g.getTransform();
 
     for (int x = 0; x < BOARD_SIZE; x++) {
       for (int y = 0; y < BOARD_SIZE; y++) {
@@ -72,6 +79,21 @@ public class Board {
         g.translate(0, SQUARE_SIZE);
       }
       g.translate(SQUARE_SIZE, -SQUARE_SIZE * BOARD_SIZE);
+    }
+
+    if (selectedPiece != null) {
+      g.setTransform(defaultTransform);
+      for (Square square :
+          selectedPiece.TYPE.getValidSquares(selectedPiece).toArray(new Square[0])) {
+        g.setColor(new Color(22, 22, 22, 100));
+        g.fillRoundRect(
+            square.x() * SQUARE_SIZE + VALID_MOVE_OFFSET,
+            square.y() * SQUARE_SIZE + VALID_MOVE_OFFSET,
+            VALID_MOVES_SIZE,
+            VALID_MOVES_SIZE,
+            VALID_MOVES_SIZE,
+            VALID_MOVES_SIZE);
+      }
     }
 
     frame.finish(g);
