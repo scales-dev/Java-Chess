@@ -55,12 +55,12 @@ public class Board {
 
         PieceTypes type =
             switch (Character.toLowerCase(c)) {
-              case 'k' -> PieceTypes.King;
-              case 'q' -> PieceTypes.Queen;
-              case 'r' -> PieceTypes.Castle;
-              case 'b' -> PieceTypes.Bishop;
-              case 'n' -> PieceTypes.Horse;
-              case 'p' -> PieceTypes.Pawn;
+              case 'k' -> PieceTypes.KING;
+              case 'q' -> PieceTypes.QUEEN;
+              case 'r' -> PieceTypes.CASTLE;
+              case 'b' -> PieceTypes.BISHOP;
+              case 'n' -> PieceTypes.HORSE;
+              case 'p' -> PieceTypes.PAWN;
               default -> throw new RuntimeException("Invalid piece: " + c);
             };
 

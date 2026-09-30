@@ -10,19 +10,61 @@ import java.util.HashMap;
 import javax.imageio.ImageIO;
 
 public enum PieceTypes {
-  King {
+  KING {
     @Override
     public HashMap<Square, Move> getValidSquares(Piece piece) {
       HashMap<Square, Move> moves = new HashMap<>();
+
+      Board board = Main.getBoard();
 
       for (Direction direction : Direction.values()) {
         addPossibleMove(piece, piece.position.offset(direction), moves);
       }
 
+      if (piece.timesMoved > 0 || containsCheck(piece, piece.position)) return moves;
+
+      Square kingPos = piece.position;
+
+      for (int x = 0; x < board.pieces.length; x++) {
+        Piece castle = board.pieces[x][kingPos.y()];
+        if (castle == null
+            || castle.WHITE != piece.WHITE
+            || castle.type != CASTLE
+            || castle.timesMoved > 0) continue;
+
+        // in case of chess960, because u wouldnt be able
+        // to choose between castling and moving 1 square.
+        if (Math.abs(x - piece.position.x()) < 2) continue;
+
+        boolean invalidCastle = false;
+        int start = Math.min(kingPos.x(), x) + 1;
+        int end = Math.max(kingPos.x(), x);
+
+        for (int i = start; i < end; i++) {
+          Square square = new Square(i, kingPos.y());
+          boolean willKingPass = Math.abs(i - kingPos.x()) <= 2;
+
+          invalidCastle =
+              isInvalidSquare(square)
+                  || containsFriend(piece, square)
+                  || (willKingPass && containsCheck(piece, square));
+          if (invalidCastle) break;
+        }
+
+        if (invalidCastle) continue;
+
+        int castleDirection = (int) Math.signum(x - piece.position.x());
+        Square newKingSquare = new Square(piece.position.x() + castleDirection * 2, kingPos.y());
+        Square newCastleSquare = newKingSquare.add(new Square(castleDirection * -1, 0));
+        Runnable moveCastle = () -> Move.movePiece(board, castle, newCastleSquare);
+
+        this.addPossibleMove(piece, newKingSquare, moveCastle, moves, false);
+      }
+
       return moves;
     }
   },
-  Queen {
+  QUEEN {
     @Override
     public HashMap<Square, Move> getValidSquares(Piece piece) {
       HashMap<Square, Move> moves = new HashMap<>();
@@ -34,7 +76,7 @@ public enum PieceTypes {
       return moves;
     }
   },
-  Horse {
+  HORSE {
     @Override
     public HashMap<Square, Move> getValidSquares(Piece piece) {
       HashMap<Square, Move> moves = new HashMap<>();
@@ -54,7 +96,7 @@ public enum PieceTypes {
       return moves;
     }
   },
-  Castle {
+  CASTLE {
     @Override
     public HashMap<Square, Move> getValidSquares(Piece piece) {
       HashMap<Square, Move> moves = new HashMap<>();
@@ -68,7 +110,7 @@ public enum PieceTypes {
       return moves;
     }
   },
-  Bishop {
+  BISHOP {
     @Override
     public HashMap<Square, Move> getValidSquares(Piece piece) {
       HashMap<Square, Move> moves = new HashMap<>();
@@ -83,7 +125,7 @@ public enum PieceTypes {
     }
   },
   // honestly the pawn should be handled completely separately, hes so weird
-  Pawn {
+  PAWN {
     @Override
     public HashMap<Square, Move> getValidSquares(Piece piece) {
       HashMap<Square, Move> moves = new HashMap<>();
@@ -96,7 +138,9 @@ public enum PieceTypes {
         this.addPossibleMove(piece, piece.position.offset(direction, 2), null, moves, false);
       }
 
-      // en passant
+      // en passant, when a pawns last move was 2 forward,
+      // it can be taken sideways by another pawn
+      // after taking, the pawn moves diagonal
       for (Direction d : new Direction[] {Direction.EAST, Direction.WEST}) {
         Square square = piece.position.offset(d);
         if (notContainsEnemy(piece, square)) continue;
@@ -104,8 +148,8 @@ public enum PieceTypes {
         Piece enPassantPiece = board.getPiece(square);
         if (board.getLastMove(!piece.WHITE) != enPassantPiece
             || enPassantPiece.timesMoved != 1
-            || enPassantPiece.type != PieceTypes.Pawn
-            || enPassantPiece.lastDistance.sum() != 2) continue;
+            || enPassantPiece.type != PieceTypes.PAWN
+            || enPassantPiece.lastDistance.y() != 2) continue;
 
         this.addPossibleMove(
             piece,
@@ -136,6 +180,10 @@ public enum PieceTypes {
         || position.x() >= board.pieces.length
         || position.y() < 0
         || position.y() >= board.pieces[0].length;
+  }
+
+  protected boolean containsCheck(Piece piece, Square position) {
+    return false;
   }
 
   protected boolean containsFriend(Piece piece, Square position) {

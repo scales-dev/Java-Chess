@@ -56,12 +56,12 @@ public record Move(Piece piece, Runnable targetAction) {
   }
 
   public static void promote(Piece piece) {
-    piece.type = PieceTypes.Queen;
+    piece.type = PieceTypes.QUEEN;
   }
 
   public static boolean shouldPromote(Piece piece) {
     int nextY = piece.position.offset(getPawnDirection(piece)).y();
-    return piece.type == PieceTypes.Pawn
+    return piece.type == PieceTypes.PAWN
         && (nextY < 0 || nextY >= Main.getBoard().pieces[0].length);
   }
 }
