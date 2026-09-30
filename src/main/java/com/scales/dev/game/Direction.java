@@ -3,7 +3,7 @@ package com.scales.dev.game;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public enum Directions {
+public enum Direction {
   NORTH(new Square(0, 1)),
   NORTH_EAST(new Square(1, 1)),
   EAST(new Square(1, 0)),
@@ -15,12 +15,12 @@ public enum Directions {
 
   public final Square vector;
 
-  public Directions rotateClockwise() {
-    return Directions.values()[(this.ordinal() + 1) % Directions.values().length];
+  public Direction rotateClockwise() {
+    return Direction.values()[(this.ordinal() + 1) % Direction.values().length];
   }
 
-  public Directions rotateCounterClockwise() {
-    return Directions.values()[
-        (this.ordinal() - 1 + Directions.values().length) % Directions.values().length];
+  public Direction rotateCounterClockwise() {
+    return Direction.values()[
+        (this.ordinal() - 1 + Direction.values().length) % Direction.values().length];
   }
 }

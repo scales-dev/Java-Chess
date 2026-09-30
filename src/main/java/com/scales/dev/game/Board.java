@@ -94,7 +94,7 @@ public class Board {
     if (selectedPiece != null) {
       g.setTransform(defaultTransform);
       for (Square square :
-          selectedPiece.TYPE.getValidSquares(selectedPiece).keySet().toArray(new Square[0])) {
+          selectedPiece.type.getValidSquares(selectedPiece).keySet().toArray(new Square[0])) {
         g.setColor(new Color(22, 22, 22, 100));
         g.fillRoundRect(
             square.x() * SQUARE_SIZE + VALID_MOVE_OFFSET,

@@ -13,10 +13,11 @@ public record Square(int x, int y) {
     return new Square(this.x * times, this.y * times);
   }
 
-  public Square offset(Directions direction) {
+  public Square offset(Direction direction) {
     return this.add(direction.vector);
   }
-  public Square offset(Directions direction, int times) {
+
+  public Square offset(Direction direction, int times) {
     return this.add(direction.vector.multiply(times));
   }
 

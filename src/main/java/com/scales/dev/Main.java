@@ -1,6 +1,7 @@
 package com.scales.dev;
 
 import com.scales.dev.game.Board;
+import com.scales.dev.game.PieceTypes;
 import com.scales.dev.window.Window;
 import lombok.Getter;
 
@@ -9,6 +10,8 @@ public class Main {
   @Getter private static final Board board = new Board();
 
   static void main() {
+    PieceTypes.loadIcons();
+
     Main.getBoard().draw();
   }
 }
