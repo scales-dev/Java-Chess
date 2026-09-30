@@ -66,13 +66,12 @@ public enum PieceTypes {
       ArrayList<Square> squares = new ArrayList<>();
 
       Directions direction = piece.WHITE ? Directions.SOUTH : Directions.NORTH;
-
-      if (addPossibleMove(piece, piece.position.offset(direction), squares)
-          && piece.timesMoved == 0) {
-        addPossibleMove(piece, piece.position.offset(direction, 2), squares);
-      }
-
       Board board = Main.getBoard();
+
+      if (addPossibleMove(null, piece.position.offset(direction), squares)
+          && piece.timesMoved == 0) {
+        addPossibleMove(null, piece.position.offset(direction, 2), squares);
+      }
 
       // en passant
       for (Directions d : new Directions[] {Directions.EAST, Directions.WEST}) {
@@ -116,7 +115,9 @@ public enum PieceTypes {
 
     Piece pieceAtPosition = Main.getBoard().getPiece(position);
 
-    return pieceAtPosition != null && piece.WHITE == pieceAtPosition.WHITE;
+    // pawn moves pass "piece" as null, because they cant take while walking, cause they weak n
+    // scrawny
+    return pieceAtPosition != null && (piece == null || piece.WHITE == pieceAtPosition.WHITE);
   }
 
   protected boolean notContainsEnemy(Piece piece, Square position) {
