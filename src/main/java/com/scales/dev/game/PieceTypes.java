@@ -107,7 +107,12 @@ public enum PieceTypes {
             || enPassantPiece.type != PieceTypes.Pawn
             || enPassantPiece.lastDistance.sum() != 2) continue;
 
-        this.addPossibleMove(piece, square.offset(direction), enPassantPiece, moves, true);
+        this.addPossibleMove(
+            piece,
+            square.offset(direction),
+            () -> Move.killPiece(board, enPassantPiece),
+            moves,
+            true);
       }
 
       // taking normally
@@ -182,15 +187,19 @@ public enum PieceTypes {
   protected boolean addPossibleMove(
       Piece piece,
       Square finalPosition,
-      Piece capturedPiece,
+      Runnable targetAction,
       HashMap<Square, Move> possibleMoves,
       boolean canCapture) {
     if (isInvalidSquare(finalPosition) || containsFriend(piece, finalPosition)) return false;
 
-    if (capturedPiece == null) capturedPiece = Main.getBoard().getPiece(finalPosition);
+    Board board = Main.getBoard();
+    Piece capturedPiece = board.getPiece(finalPosition);
     if (capturedPiece != null && !canCapture) return false;
 
-    possibleMoves.put(finalPosition, new Move(piece, capturedPiece));
+    if (targetAction == null)
+      targetAction = () -> Move.killPiece(board, board.getPiece(finalPosition));
+
+    possibleMoves.put(finalPosition, new Move(piece, targetAction));
 
     return true;
   }

@@ -3,19 +3,9 @@ package com.scales.dev.game;
 import com.scales.dev.Main;
 import java.util.HashMap;
 
-public record Move(Piece piece, Piece capturedPiece) {
+public record Move(Piece piece, Runnable targetAction) {
   public static Direction getPawnDirection(Piece piece) {
     return piece.WHITE ? Direction.SOUTH : Direction.NORTH;
-  }
-
-  private static void promote(Piece piece) {
-    piece.type = PieceTypes.Queen;
-  }
-
-  private static boolean shouldPromote(Piece piece) {
-    int nextY = piece.position.offset(getPawnDirection(piece)).y();
-    return piece.type == PieceTypes.Pawn
-        && (nextY < 0 || nextY >= Main.getBoard().pieces[0].length);
   }
 
   public static boolean movePiece(Board board, Piece piece, Square position) {
@@ -47,22 +37,31 @@ public record Move(Piece piece, Piece capturedPiece) {
     // move from old position
     board.pieces[move.piece.position.x()][move.piece.position.y()] = null;
 
-    killPiece(board, move.capturedPiece);
+    // generally killing a piece, sometimes switching
+    move.targetAction.run();
+    if (shouldPromote(move.piece)) promote(move.piece);
 
     // move to new position, replacing whatever was there,
     // although there is likely nothing, unless the "captured piece" is smth random
     board.pieces[to.x()][to.y()] = move.piece;
 
     board.setLastMove(move.piece);
-
-    // we dont wanna stay selecting the same piece </3
-    board.selectedPiece = null;
   }
 
-  private static void killPiece(Board board, Piece piece) {
+  public static void killPiece(Board board, Piece piece) {
     if (piece == null) return;
 
     // kill the opps
     board.pieces[piece.position.x()][piece.position.y()] = null;
+  }
+
+  public static void promote(Piece piece) {
+    piece.type = PieceTypes.Queen;
+  }
+
+  public static boolean shouldPromote(Piece piece) {
+    int nextY = piece.position.offset(getPawnDirection(piece)).y();
+    return piece.type == PieceTypes.Pawn
+        && (nextY < 0 || nextY >= Main.getBoard().pieces[0].length);
   }
 }

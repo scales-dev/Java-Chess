@@ -24,6 +24,9 @@ public class MouseListener extends MouseAdapter {
 
     if (!Move.movePiece(board, board.selectedPiece, new Square(x, y))) {
       board.selectedPiece = board.pieces[x][y];
+    } else {
+      // we dont wanna stay selecting the same piece </3
+      board.selectedPiece = null;
     }
 
     board.draw();
