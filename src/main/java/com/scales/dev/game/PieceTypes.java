@@ -39,6 +39,18 @@ public enum PieceTypes {
     public HashMap<Square, Move> getValidSquares(Piece piece) {
       HashMap<Square, Move> moves = new HashMap<>();
 
+      for (Direction direction : Direction.values()) {
+        if (direction.isDiagonal()) continue;
+
+        // bad name, idk what to name this
+        Square up = piece.position.offset(direction);
+
+        // u make 8 L shapes by offsetting 1 in every cardinal direction,
+        // then diagonal clockwise/counterclockwise
+        this.addPossibleMove(piece, up.offset(direction.rotateClockwise()), moves);
+        this.addPossibleMove(piece, up.offset(direction.rotateCounterClockwise()), moves);
+      }
+
       return moves;
     }
   },
@@ -79,9 +91,9 @@ public enum PieceTypes {
       Direction direction = Move.getPawnDirection(piece);
       Board board = Main.getBoard();
 
-      if (addPossibleMove(piece, piece.position.offset(direction), null, moves, false)
+      if (this.addPossibleMove(piece, piece.position.offset(direction), null, moves, false)
           && piece.timesMoved == 0) {
-        addPossibleMove(piece, piece.position.offset(direction, 2), null, moves, false);
+        this.addPossibleMove(piece, piece.position.offset(direction, 2), null, moves, false);
       }
 
       // en passant
@@ -95,7 +107,7 @@ public enum PieceTypes {
             || enPassantPiece.type != PieceTypes.Pawn
             || enPassantPiece.lastDistance.sum() != 2) continue;
 
-        addPossibleMove(piece, square.offset(direction), enPassantPiece, moves, true);
+        this.addPossibleMove(piece, square.offset(direction), enPassantPiece, moves, true);
       }
 
       // taking normally
@@ -103,7 +115,7 @@ public enum PieceTypes {
           new Direction[] {direction.rotateClockwise(), direction.rotateCounterClockwise()}) {
         Square square = piece.position.offset(d);
         if (notContainsEnemy(piece, square)) continue;
-        addPossibleMove(piece, square, moves);
+        this.addPossibleMove(piece, square, moves);
       }
 
       return moves;
