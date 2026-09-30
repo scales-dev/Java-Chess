@@ -23,4 +23,8 @@ public enum Direction {
     return Direction.values()[
         (this.ordinal() - 1 + Direction.values().length) % Direction.values().length];
   }
+
+  public boolean isDiagonal() {
+    return this.vector.x() != 0 && this.vector.y() != 0;
+  }
 }

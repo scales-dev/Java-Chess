@@ -25,18 +25,13 @@ public enum PieceTypes {
   Queen {
     @Override
     public HashMap<Square, Move> getValidSquares(Piece piece) {
-      HashMap<Square, Move> squares = new HashMap<>();
+      HashMap<Square, Move> moves = new HashMap<>();
 
       for (Direction direction : Direction.values()) {
-        Square nextPosition = piece.position;
-        while (this.addPossibleMove(
-            piece, nextPosition = nextPosition.offset(direction), squares)) {
-          // we can take 1 piece, but not the piece behind.
-          if (Main.getBoard().pieces[nextPosition.x()][nextPosition.y()] != null) break;
-        }
+        this.addDirection(piece, direction, moves);
       }
 
-      return squares;
+      return moves;
     }
   },
   Horse {
@@ -52,6 +47,12 @@ public enum PieceTypes {
     public HashMap<Square, Move> getValidSquares(Piece piece) {
       HashMap<Square, Move> moves = new HashMap<>();
 
+      for (Direction direction : Direction.values()) {
+        if (direction.isDiagonal()) continue;
+
+        this.addDirection(piece, direction, moves);
+      }
+
       return moves;
     }
   },
@@ -59,6 +60,12 @@ public enum PieceTypes {
     @Override
     public HashMap<Square, Move> getValidSquares(Piece piece) {
       HashMap<Square, Move> moves = new HashMap<>();
+
+      for (Direction direction : Direction.values()) {
+        if (!direction.isDiagonal()) continue;
+
+        this.addDirection(piece, direction, moves);
+      }
 
       return moves;
     }
@@ -186,5 +193,15 @@ public enum PieceTypes {
 
   public void draw(Graphics2D g, int size, boolean white) {
     g.drawImage(getIcon(white), 0, 0, size, size, null);
+  }
+
+  /// adds a direction with INFINITE range, cause queens, horses, and bishops are just built
+  /// different
+  protected void addDirection(Piece piece, Direction direction, HashMap<Square, Move> moves) {
+    Square nextPosition = piece.position;
+    while (this.addPossibleMove(piece, nextPosition = nextPosition.offset(direction), moves)) {
+      // we can take 1 piece, but not the piece behind.
+      if (Main.getBoard().pieces[nextPosition.x()][nextPosition.y()] != null) break;
+    }
   }
 }
