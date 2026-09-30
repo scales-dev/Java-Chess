@@ -1,25 +1,25 @@
 package com.scales.dev.game;
 
 import com.scales.dev.Main;
-import java.util.ArrayList;
+import java.util.HashMap;
 
 public enum PieceTypes {
   King {
     @Override
-    public ArrayList<Square> getValidSquares(Piece piece) {
-      ArrayList<Square> squares = new ArrayList<>();
+    public HashMap<Square, Move> getValidSquares(Piece piece) {
+      HashMap<Square, Move> moves = new HashMap<>();
 
       for (Directions direction : Directions.values()) {
-        addPossibleMove(piece, piece.position.offset(direction), squares);
+        addPossibleMove(piece, piece.position.offset(direction), moves);
       }
 
-      return squares;
+      return moves;
     }
   },
   Queen {
     @Override
-    public ArrayList<Square> getValidSquares(Piece piece) {
-      ArrayList<Square> squares = new ArrayList<>();
+    public HashMap<Square, Move> getValidSquares(Piece piece) {
+      HashMap<Square, Move> squares = new HashMap<>();
 
       for (Directions direction : Directions.values()) {
         Square nextPosition = piece.position;
@@ -35,26 +35,26 @@ public enum PieceTypes {
   },
   Horse {
     @Override
-    public ArrayList<Square> getValidSquares(Piece piece) {
-      ArrayList<Square> squares = new ArrayList<>();
+    public HashMap<Square, Move> getValidSquares(Piece piece) {
+      HashMap<Square, Move> moves = new HashMap<>();
 
-      return squares;
+      return moves;
     }
   },
   Castle {
     @Override
-    public ArrayList<Square> getValidSquares(Piece piece) {
-      ArrayList<Square> squares = new ArrayList<>();
+    public HashMap<Square, Move> getValidSquares(Piece piece) {
+      HashMap<Square, Move> moves = new HashMap<>();
 
-      return squares;
+      return moves;
     }
   },
   Bishop {
     @Override
-    public ArrayList<Square> getValidSquares(Piece piece) {
-      ArrayList<Square> squares = new ArrayList<>();
+    public HashMap<Square, Move> getValidSquares(Piece piece) {
+      HashMap<Square, Move> moves = new HashMap<>();
 
-      return squares;
+      return moves;
     }
   },
   // honestly the pawn should be handled completely separately, hes so weird
@@ -62,15 +62,14 @@ public enum PieceTypes {
   //  promotion
   Pawn {
     @Override
-    public ArrayList<Square> getValidSquares(Piece piece) {
-      ArrayList<Square> squares = new ArrayList<>();
+    public HashMap<Square, Move> getValidSquares(Piece piece) {
+      HashMap<Square, Move> moves = new HashMap<>();
 
       Directions direction = piece.WHITE ? Directions.SOUTH : Directions.NORTH;
       Board board = Main.getBoard();
 
-      if (addPossibleMove(null, piece.position.offset(direction), squares)
-          && piece.timesMoved == 0) {
-        addPossibleMove(null, piece.position.offset(direction, 2), squares);
+      if (addPossibleMove(null, piece.position.offset(direction), moves) && piece.timesMoved == 0) {
+        addPossibleMove(null, piece.position.offset(direction, 2), moves);
       }
 
       // en passant
@@ -84,7 +83,7 @@ public enum PieceTypes {
             || enPassantPiece.TYPE != PieceTypes.Pawn
             || enPassantPiece.lastDistance.sum() != 2) continue;
 
-        addPossibleMove(piece, square.offset(direction), squares);
+        addPossibleMove(piece, square.offset(direction), enPassantPiece, moves);
       }
 
       // taking normally
@@ -92,14 +91,14 @@ public enum PieceTypes {
           new Directions[] {direction.rotateClockwise(), direction.rotateCounterClockwise()}) {
         Square square = piece.position.offset(d);
         if (notContainsEnemy(piece, square)) continue;
-        addPossibleMove(piece, square, squares);
+        addPossibleMove(piece, square, moves);
       }
 
-      return squares;
+      return moves;
     }
   };
 
-  public abstract ArrayList<Square> getValidSquares(Piece piece);
+  public abstract HashMap<Square, Move> getValidSquares(Piece piece);
 
   protected boolean isInvalidSquare(Square position) {
     Board board = Main.getBoard();
@@ -129,9 +128,16 @@ public enum PieceTypes {
   }
 
   protected boolean addPossibleMove(
-      Piece piece, Square finalPosition, ArrayList<Square> possibleMoves) {
+      Piece piece, Square finalPosition, HashMap<Square, Move> possibleMoves) {
+    return this.addPossibleMove(piece, finalPosition, null, possibleMoves);
+  }
+
+  protected boolean addPossibleMove(
+      Piece piece, Square finalPosition, Piece capturedPiece, HashMap<Square, Move> possibleMoves) {
     if (isInvalidSquare(finalPosition) || containsFriend(piece, finalPosition)) return false;
-    possibleMoves.add(finalPosition);
+
+    if (capturedPiece == null) capturedPiece = Main.getBoard().getPiece(finalPosition);
+    possibleMoves.put(finalPosition, new Move(piece, capturedPiece));
 
     return true;
   }

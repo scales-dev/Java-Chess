@@ -2,12 +2,13 @@ package com.scales.dev.window;
 
 import com.scales.dev.Main;
 import com.scales.dev.game.Board;
+import com.scales.dev.game.Move;
 import com.scales.dev.game.Piece;
 import com.scales.dev.game.Square;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MouseListener extends MouseAdapter {
   @Override
@@ -30,34 +31,37 @@ public class MouseListener extends MouseAdapter {
     board.draw();
   }
 
-  // todo: move
+  // todo: move this
   private boolean movePiece(Board board, Piece piece, Square position) {
-    if (piece != null) {
-      ArrayList<Square> possibleMoves = piece.TYPE.getValidSquares(piece);
-      if (possibleMoves.contains(position)) {
-        Square currentPosition = piece.position;
+    if (piece == null) return false;
+    HashMap<Square, Move> possibleMoves = piece.TYPE.getValidSquares(piece);
+    Move move = possibleMoves.get(position);
 
-        // move from old position
-        board.pieces[currentPosition.x()][currentPosition.y()] = null;
+    if (move == null) return false;
 
-        // update piece data
-        piece.timesMoved++;
-        piece.lastMoved = System.currentTimeMillis();
-        piece.lastDistance = piece.position.difference(position);
+    // move from old position
+    board.pieces[piece.position.x()][piece.position.y()] = null;
 
-        // move to new position, replacing whatever was there
-        board.pieces[position.x()][position.y()] = piece;
-        piece.position = position;
+    // update piece data
+    piece.timesMoved++;
+    piece.lastMoved = System.currentTimeMillis();
+    piece.lastDistance = piece.position.difference(position);
+    piece.position = position;
 
-        board.setLastMove(piece);
-
-        // we dont wanna stay selecting the same piece </3
-        board.selectedPiece = null;
-
-        return true;
-      }
+    if (move.capturedPiece() != null) {
+      // kill the opps
+      board.pieces[move.capturedPiece().position.x()][move.capturedPiece().position.y()] = null;
     }
 
-    return false;
+    // move to new position, replacing whatever was there, although there is likely nothing, unless
+    // the "captured piece" is smth random
+    board.pieces[position.x()][position.y()] = piece;
+
+    board.setLastMove(piece);
+
+    // we dont wanna stay selecting the same piece </3
+    board.selectedPiece = null;
+
+    return true;
   }
 }
