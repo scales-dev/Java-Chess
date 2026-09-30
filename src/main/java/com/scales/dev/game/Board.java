@@ -16,6 +16,9 @@ public class Board {
   private static final Color BLACK_SQUARE = new Color(118, 150, 86);
   private static final Color SELECTED_SQUARE = new Color(186, 202, 68);
 
+  private static final Color VALID_SQUARE_COLOUR = new Color(22, 22, 22, 100);
+  private static final int takesIndicatorThickness = 3;
+
   public final Piece[][] pieces = new Piece[BOARD_SIZE][BOARD_SIZE];
   public Piece selectedPiece;
 
@@ -95,14 +98,27 @@ public class Board {
       g.setTransform(defaultTransform);
       for (Square square :
           selectedPiece.type.getValidSquares(selectedPiece).keySet().toArray(new Square[0])) {
-        g.setColor(new Color(22, 22, 22, 100));
-        g.fillRoundRect(
-            square.x() * SQUARE_SIZE + VALID_MOVE_OFFSET,
-            square.y() * SQUARE_SIZE + VALID_MOVE_OFFSET,
-            VALID_MOVES_SIZE,
-            VALID_MOVES_SIZE,
-            VALID_MOVES_SIZE,
-            VALID_MOVES_SIZE);
+        boolean hasEnemy = getPiece(square) != null;
+        g.setColor(VALID_SQUARE_COLOUR);
+
+        if (hasEnemy) {
+          g.setStroke(new BasicStroke(takesIndicatorThickness * 2));
+          g.drawRoundRect(
+              square.x() * SQUARE_SIZE + takesIndicatorThickness,
+              square.y() * SQUARE_SIZE + takesIndicatorThickness,
+              SQUARE_SIZE - (takesIndicatorThickness * 2),
+              SQUARE_SIZE - (takesIndicatorThickness * 2),
+              SQUARE_SIZE,
+              SQUARE_SIZE);
+        } else {
+          g.fillRoundRect(
+              square.x() * SQUARE_SIZE + VALID_MOVE_OFFSET,
+              square.y() * SQUARE_SIZE + VALID_MOVE_OFFSET,
+              VALID_MOVES_SIZE,
+              VALID_MOVES_SIZE,
+              VALID_MOVES_SIZE,
+              VALID_MOVES_SIZE);
+        }
       }
     }
 
