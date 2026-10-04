@@ -53,14 +53,14 @@ public class Board {
 
         boolean white = Character.isUpperCase(c);
 
-        PieceTypes type =
+        PieceType type =
             switch (Character.toLowerCase(c)) {
-              case 'k' -> PieceTypes.KING;
-              case 'q' -> PieceTypes.QUEEN;
-              case 'r' -> PieceTypes.CASTLE;
-              case 'b' -> PieceTypes.BISHOP;
-              case 'n' -> PieceTypes.HORSE;
-              case 'p' -> PieceTypes.PAWN;
+              case 'k' -> PieceType.KING;
+              case 'q' -> PieceType.QUEEN;
+              case 'r' -> PieceType.CASTLE;
+              case 'b' -> PieceType.BISHOP;
+              case 'n' -> PieceType.HORSE;
+              case 'p' -> PieceType.PAWN;
               default -> throw new RuntimeException("Invalid piece: " + c);
             };
 
@@ -97,7 +97,7 @@ public class Board {
     if (selectedPiece != null) {
       g.setTransform(defaultTransform);
       for (Square square :
-          selectedPiece.type.getValidSquares(selectedPiece).keySet().toArray(new Square[0])) {
+          selectedPiece.type.getValidSquares(this, selectedPiece).keySet().toArray(new Square[0])) {
         boolean hasEnemy = getPiece(square) != null;
         g.setColor(VALID_SQUARE_COLOUR);
 
@@ -127,6 +127,22 @@ public class Board {
 
   public Piece getPiece(Square square) {
     return pieces[square.x()][square.y()];
+  }
+
+  public boolean containsFriend(Piece piece, Square position) {
+    if (position.isInvalidSquare(this.pieces)) return false;
+    Piece pieceAtPosition = this.pieces[position.x()][position.y()];
+
+    // pawn moves pass "piece" as null,
+    // because they cant take while walking, cause they weak n scrawny
+    return pieceAtPosition != null && (piece == null || piece.WHITE == pieceAtPosition.WHITE);
+  }
+
+  public boolean notContainsEnemy(Piece piece, Square position) {
+    if (position.isInvalidSquare(this.pieces)) return true;
+    Piece pieceAtPosition = this.pieces[position.x()][position.y()];
+
+    return pieceAtPosition == null || piece.WHITE == pieceAtPosition.WHITE;
   }
 
   private Color getSquareColor(int x, int y, Piece piece) {

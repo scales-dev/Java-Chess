@@ -3,14 +3,14 @@ package com.scales.dev.game;
 import com.scales.dev.Main;
 import java.util.HashMap;
 
-public record Move(Piece piece, Runnable targetAction) {
+public record Move(Piece piece, MoveAction moveAction) {
   public static Direction getPawnDirection(Piece piece) {
     return piece.WHITE ? Direction.SOUTH : Direction.NORTH;
   }
 
   public static boolean movePiece(Board board, Piece piece, Square position) {
     if (piece == null) return false;
-    HashMap<Square, Move> possibleMoves = piece.type.getValidSquares(piece);
+    HashMap<Square, Move> possibleMoves = piece.type.getValidSquares(board, piece);
     Move move = possibleMoves.get(position);
 
     if (move == null) return false;
@@ -38,7 +38,7 @@ public record Move(Piece piece, Runnable targetAction) {
     board.pieces[move.piece.position.x()][move.piece.position.y()] = null;
 
     // generally killing a piece, sometimes switching
-    move.targetAction.run();
+    move.moveAction.action().run();
     if (shouldPromote(move.piece)) promote(move.piece);
 
     // move to new position, replacing whatever was there,
@@ -56,12 +56,11 @@ public record Move(Piece piece, Runnable targetAction) {
   }
 
   public static void promote(Piece piece) {
-    piece.type = PieceTypes.QUEEN;
+    piece.type = PieceType.QUEEN;
   }
 
   public static boolean shouldPromote(Piece piece) {
     int nextY = piece.position.offset(getPawnDirection(piece)).y();
-    return piece.type == PieceTypes.PAWN
-        && (nextY < 0 || nextY >= Main.getBoard().pieces[0].length);
+    return piece.type == PieceType.PAWN && (nextY < 0 || nextY >= Main.getBoard().pieces[0].length);
   }
 }

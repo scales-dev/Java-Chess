@@ -24,4 +24,11 @@ public record Square(int x, int y) {
   public int sum() {
     return this.x + this.y;
   }
+
+  public boolean isInvalidSquare(Piece[][] pieces) {
+    return this.x() < 0
+        || this.x() >= pieces.length
+        || this.y() < 0
+        || this.y() >= pieces[0].length;
+  }
 }
