@@ -6,7 +6,7 @@ import java.util.HashMap;
 public class Piece {
 
   public PieceType type;
-  public final boolean WHITE;
+  public final ChessColour colour;
 
   public long lastMoved = -1;
   public int timesMoved = 0;
@@ -14,15 +14,15 @@ public class Piece {
 
   public Square position;
 
-  public Piece(PieceType piece, boolean white, Square position) {
+  public Piece(PieceType piece, ChessColour colour, Square position) {
     this.type = piece;
-    this.WHITE = white;
+    this.colour = colour;
 
     this.position = position;
   }
 
   public void draw(Graphics2D g, int size) {
-    type.draw(g, size, WHITE);
+    type.draw(g, size, colour);
   }
 
   public boolean wouldCheck(Square targetSquare, Board board, boolean verifyingCheck) {
@@ -47,7 +47,7 @@ public class Piece {
   public boolean isChecked(Square targetSquare, Board board) {
     for (Piece[] row : board.pieces) {
       for (Piece piece : row) {
-        if (piece == null || piece.WHITE == this.WHITE) continue;
+        if (piece == null || piece.colour == this.colour) continue;
 
         HashMap<Square, Move> moves = piece.type.getValidSquares(board, piece, true);
 

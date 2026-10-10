@@ -32,7 +32,7 @@ public enum PieceType {
       for (int x = 0; x < board.pieces.length; x++) {
         Piece castle = board.pieces[x][kingPos.y()];
         if (castle == null
-            || castle.WHITE != piece.WHITE
+            || castle.colour != piece.colour
             || castle.type != CASTLE
             || castle.timesMoved > 0) continue;
 
@@ -133,8 +133,7 @@ public enum PieceType {
     @Override
     public HashMap<Square, Move> getValidSquares(Board board, Piece piece, boolean verifyingCheck) {
       HashMap<Square, Move> moves = new HashMap<>();
-
-      Direction direction = Move.getPawnDirection(piece);
+      Direction direction = piece.colour.pawnDirection;
 
       int pawnDistance = piece.timesMoved == 0 ? 2 : 1;
       // pawns move 1 forward!
@@ -151,7 +150,7 @@ public enum PieceType {
         if (board.notContainsEnemy(piece, square)) continue;
 
         Piece enPassantPiece = board.getPiece(square);
-        if (board.getLastMove(!piece.WHITE) != enPassantPiece
+        if (board.getTeam(enPassantPiece.colour).lastMovedPiece != enPassantPiece
             || enPassantPiece.timesMoved != 1
             || enPassantPiece.type != PieceType.PAWN
             || enPassantPiece.lastDistance.y() != 2) continue;
@@ -200,6 +199,7 @@ public enum PieceType {
       new RescaleOp(new float[] {-1f, -1f, -1f, 1f}, new float[] {255f, 255f, 255f, 0f}, null);
 
   public HashMap<Square, Move> getValidSquares(Board board, Piece piece) {
+    if (board.currentTurn != piece.colour) return new HashMap<>();
     return this.getValidSquares(board, piece, false);
   }
 
@@ -251,11 +251,12 @@ public enum PieceType {
     return "/pieces/" + this.name().toLowerCase() + ".png";
   }
 
-  private BufferedImage getIcon(boolean white) {
-    return ICONS[white ? this.ordinal() : this.ordinal() + PieceType.values().length];
+  private BufferedImage getIcon(ChessColour colour) {
+    return ICONS[
+        colour == ChessColour.WHITE ? this.ordinal() : this.ordinal() + PieceType.values().length];
   }
 
-  public void draw(Graphics2D g, int size, boolean white) {
-    g.drawImage(getIcon(white), 0, 0, size, size, null);
+  public void draw(Graphics2D g, int size, ChessColour colour) {
+    g.drawImage(getIcon(colour), 0, 0, size, size, null);
   }
 }

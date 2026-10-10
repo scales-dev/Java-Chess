@@ -1,8 +1,10 @@
 package com.scales.dev.window;
 
+import com.scales.dev.Main;
 import com.scales.dev.game.Board;
 import java.awt.*;
 import java.awt.image.BufferStrategy;
+import java.util.Objects;
 import javax.swing.*;
 
 // I personally wish that all JFrames were spawned like this, sadly they arent.
@@ -11,6 +13,8 @@ public class Window extends JFrame {
 
   public Window() {
     super("Chess");
+    this.setIconImage(
+        new ImageIcon(Objects.requireNonNull(Main.class.getResource("/icon.png"))).getImage());
 
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     this.setResizable(false);

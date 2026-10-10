@@ -12,8 +12,6 @@ public class Board {
   private static final int VALID_MOVES_SIZE = (int) (SQUARE_SIZE / 2.5f);
   private static final int VALID_MOVE_OFFSET = (SQUARE_SIZE / 2) - (VALID_MOVES_SIZE / 2);
 
-  private static final Color WHITE_SQUARE = new Color(238, 238, 210);
-  private static final Color BLACK_SQUARE = new Color(118, 150, 86);
   private static final Color SELECTED_SQUARE = new Color(186, 202, 68);
   private static final Color CHECKED_SQUARE_TINT = new Color(255, 50, 50, 170);
 
@@ -25,18 +23,19 @@ public class Board {
 
   private static final String DEFAULT_POSITION = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 
-  private final Piece[] lastMovePerTeam = new Piece[2];
-
-  public Piece getLastMove(boolean white) {
-    return lastMovePerTeam[white ? 0 : 1];
-  }
-
-  public void setLastMove(Piece piece) {
-    lastMovePerTeam[piece.WHITE ? 0 : 1] = piece;
-  }
+  public final Team WHITE;
+  public final Team BLACK;
+  public ChessColour currentTurn = ChessColour.WHITE;
 
   public Board() {
     loadFenNotation(DEFAULT_POSITION);
+
+    this.WHITE = new Team(ChessColour.WHITE, pieces);
+    this.BLACK = new Team(ChessColour.BLACK, pieces);
+  }
+
+  public Team getTeam(ChessColour colour) {
+    return colour == ChessColour.WHITE ? WHITE : BLACK;
   }
 
   // https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
@@ -65,7 +64,8 @@ public class Board {
               default -> throw new RuntimeException("Invalid piece: " + c);
             };
 
-        pieces[x][y] = new Piece(type, white, new Square(x, y));
+        pieces[x][y] =
+            new Piece(type, white ? ChessColour.WHITE : ChessColour.BLACK, new Square(x, y));
         x++;
       }
     }
@@ -142,20 +142,20 @@ public class Board {
 
     // pawn moves pass "piece" as null,
     // because they cant take while walking, cause they weak n scrawny
-    return pieceAtPosition != null && (piece == null || piece.WHITE == pieceAtPosition.WHITE);
+    return pieceAtPosition != null && (piece == null || piece.colour == pieceAtPosition.colour);
   }
 
   public boolean notContainsEnemy(Piece piece, Square position) {
     if (position.isInvalidSquare(this.pieces)) return true;
     Piece pieceAtPosition = this.pieces[position.x()][position.y()];
 
-    return pieceAtPosition == null || piece.WHITE == pieceAtPosition.WHITE;
+    return pieceAtPosition == null || piece.colour == pieceAtPosition.colour;
   }
 
   private Color getSquareColor(int x, int y, Piece piece) {
     // i dont like stacking ternary operators
     if (piece != null && piece == selectedPiece) return SELECTED_SQUARE;
-    return x % 2 == y % 2 ? WHITE_SQUARE : BLACK_SQUARE;
+    return ChessColour.getSquareColour(x, y);
   }
 
   public Rectangle getBoardRectangle() {

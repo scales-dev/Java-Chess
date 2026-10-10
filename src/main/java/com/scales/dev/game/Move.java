@@ -4,10 +4,6 @@ import com.scales.dev.Main;
 import java.util.HashMap;
 
 public record Move(Piece piece, MoveAction moveAction) {
-  public static Direction getPawnDirection(Piece piece) {
-    return piece.WHITE ? Direction.SOUTH : Direction.NORTH;
-  }
-
   public static boolean movePiece(Board board, Piece piece, Square position) {
     if (piece == null) return false;
     HashMap<Square, Move> possibleMoves = piece.type.getValidSquares(board, piece);
@@ -45,7 +41,10 @@ public record Move(Piece piece, MoveAction moveAction) {
     // although there is likely nothing, unless the "captured piece" is smth random
     board.pieces[to.x()][to.y()] = move.piece;
 
-    board.setLastMove(move.piece);
+    board.getTeam(move.piece.colour).lastMovedPiece = move.piece;
+
+    ChessColour[] values = ChessColour.values();
+    board.currentTurn = values[(board.currentTurn.ordinal() + 1) % values.length];
   }
 
   public static void killPiece(Board board, Piece piece) {
@@ -60,7 +59,7 @@ public record Move(Piece piece, MoveAction moveAction) {
   }
 
   public static boolean shouldPromote(Piece piece) {
-    int nextY = piece.position.offset(getPawnDirection(piece)).y();
+    int nextY = piece.position.offset(piece.colour.pawnDirection).y();
     return piece.type == PieceType.PAWN && (nextY < 0 || nextY >= Main.getBoard().pieces[0].length);
   }
 }

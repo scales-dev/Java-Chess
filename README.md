@@ -11,16 +11,17 @@ class stores a lot more than it needs to.
 
 # Images from chess.com, stolen below:
 
-- https://assets-themes.chess.com/image/9rdwe/200.png
-- https://assets-themes.chess.com/image/ejgfv/150/wk.png
-- https://assets-themes.chess.com/image/ejgfv/150/wq.png
-- https://assets-themes.chess.com/image/ejgfv/150/wr.png
-- https://assets-themes.chess.com/image/ejgfv/150/wb.png
-- https://assets-themes.chess.com/image/ejgfv/150/wn.png
-- https://assets-themes.chess.com/image/ejgfv/150/wp.png
-- https://assets-themes.chess.com/image/ejgfv/150/bk.png
-- https://assets-themes.chess.com/image/ejgfv/150/bq.png
-- https://assets-themes.chess.com/image/ejgfv/150/br.png
-- https://assets-themes.chess.com/image/ejgfv/150/bb.png
-- https://assets-themes.chess.com/image/ejgfv/150/bn.png
-- https://assets-themes.chess.com/image/ejgfv/150/bp.png
+![image](https://assets-themes.chess.com/image/9rdwe/200.png)
+![image](https://assets-themes.chess.com/image/ejgfv/150/wk.png)
+![image](https://assets-themes.chess.com/image/ejgfv/150/wq.png)
+![image](https://assets-themes.chess.com/image/ejgfv/150/wr.png)
+![image](https://assets-themes.chess.com/image/ejgfv/150/wb.png)
+![image](https://assets-themes.chess.com/image/ejgfv/150/wn.png)
+![image](https://assets-themes.chess.com/image/ejgfv/150/wp.png)
+![image](https://assets-themes.chess.com/image/ejgfv/150/bk.png)
+![image](https://assets-themes.chess.com/image/ejgfv/150/bq.png)
+![image](https://assets-themes.chess.com/image/ejgfv/150/br.png)
+![image](https://assets-themes.chess.com/image/ejgfv/150/bb.png)
+![image](https://assets-themes.chess.com/image/ejgfv/150/bn.png)
+![image](https://assets-themes.chess.com/image/ejgfv/150/bp.png)
+![image](https://www.chess.com/bundles/web/favicons/favicon.5d6cb047.svg)
