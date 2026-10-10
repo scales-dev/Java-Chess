@@ -1,5 +1,10 @@
-# Speed Chess
-### I really enjoy 1|1 bullet chess on [chess.com](https://www.chess.com/) but I just wish it could be faster :pensive:
+# Java-Chess
+
+### Singleplayer chess, made in Java, just a fun project.
+
+Originally I planned to make this project "speed chess" (instead of turn based, each piece had a delay), but I found out
+its been done before, and lost interest. That's why some stuff like en passant is implemented weirdly, and each `Piece`
+class stores a lot more than it needs to.
 
 > Follows [Google's style guide](https://google.github.io/styleguide/javaguide.html),
 > Install their plugin to do formatting for [IntelliJ](https://github.com/google/google-java-format/blob/master/README.md#intellij-android-studio-and-other-jetbrains-ides) or [Eclipse](https://github.com/google/google-java-format/blob/master/README.md#eclipse)

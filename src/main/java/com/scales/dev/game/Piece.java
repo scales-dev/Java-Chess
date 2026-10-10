@@ -44,7 +44,7 @@ public class Piece {
     return isChecked;
   }
 
-  private boolean isChecked(Square targetSquare, Board board) {
+  public boolean isChecked(Square targetSquare, Board board) {
     for (Piece[] row : board.pieces) {
       for (Piece piece : row) {
         if (piece == null || piece.WHITE == this.WHITE) continue;

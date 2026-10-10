@@ -21,10 +21,6 @@ public record Square(int x, int y) {
     return this.add(direction.vector.multiply(times));
   }
 
-  public int sum() {
-    return this.x + this.y;
-  }
-
   public boolean isInvalidSquare(Piece[][] pieces) {
     return this.x() < 0
         || this.x() >= pieces.length

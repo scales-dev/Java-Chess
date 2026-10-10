@@ -15,6 +15,7 @@ public class Board {
   private static final Color WHITE_SQUARE = new Color(238, 238, 210);
   private static final Color BLACK_SQUARE = new Color(118, 150, 86);
   private static final Color SELECTED_SQUARE = new Color(186, 202, 68);
+  private static final Color CHECKED_SQUARE_TINT = new Color(255, 50, 50, 170);
 
   private static final Color VALID_SQUARE_COLOUR = new Color(22, 22, 22, 100);
   private static final int takesIndicatorThickness = 3;
@@ -87,6 +88,12 @@ public class Board {
         g.fillRect(0, 0, SQUARE_SIZE, SQUARE_SIZE);
 
         if (piece != null) {
+          if (!piece.equals(selectedPiece)
+              && piece.type == PieceType.KING
+              && piece.isChecked(new Square(x, y), this)) {
+            g.setColor(CHECKED_SQUARE_TINT);
+            g.fillRect(0, 0, SQUARE_SIZE, SQUARE_SIZE);
+          }
           piece.draw(g, SQUARE_SIZE);
         }
         g.translate(0, SQUARE_SIZE);
