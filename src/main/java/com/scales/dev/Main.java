@@ -9,7 +9,9 @@ public class Main {
   @Getter private static final Window frame = new Window();
   @Getter private static final Board board = new Board();
 
-  static void main() {
+  // did you know that you dont need the space between String[] and args?
+  // you can also make it String args[] or String...args, or even put nothing in Java 25!
+  public static void main(String[] args) {
     PieceType.loadIcons();
 
     Main.getBoard().draw();

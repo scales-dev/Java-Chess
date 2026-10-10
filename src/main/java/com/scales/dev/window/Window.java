@@ -10,7 +10,7 @@ public class Window extends JFrame {
   private final BufferStrategy bs;
 
   public Window() {
-    super("Speed Chess");
+    super("Chess");
 
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     this.setResizable(false);
