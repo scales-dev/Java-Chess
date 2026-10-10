@@ -16,15 +16,10 @@ public enum PieceType {
       HashMap<Square, Move> moves = new HashMap<>();
 
       for (Direction direction : Direction.values()) {
-        Square newPosition = piece.position.offset(direction);
-        // moving to a position containing check is ILLEGAL
-        // although my father never taught me this
-        // games often ended by me not realising i was in check.
-        if (piece.wouldCheck(newPosition, board, verifyingCheck)) continue;
-        addPossibleMove(board, piece, piece.position.offset(direction), moves);
+        addPossibleMove(board, piece, piece.position.offset(direction), moves, verifyingCheck);
       }
 
-      if (piece.timesMoved > 0 || piece.wouldCheck(piece.position, board, verifyingCheck))
+      if (piece.timesMoved > 0 || piece.wouldCheck(piece, piece.position, board, verifyingCheck))
         return moves;
 
       Square kingPos = piece.position;
@@ -51,7 +46,7 @@ public enum PieceType {
           invalidCastle =
               square.isInvalidSquare(board.pieces)
                   || board.containsFriend(piece, square)
-                  || (willKingPass && piece.wouldCheck(square, board, verifyingCheck));
+                  || (willKingPass && piece.wouldCheck(piece, square, board, verifyingCheck));
           if (invalidCastle) break;
         }
 
@@ -62,7 +57,7 @@ public enum PieceType {
         Square newCastleSquare = newKingSquare.add(new Square(castleDirection * -1, 0));
         Runnable moveCastle = () -> Move.movePiece(board, castle, newCastleSquare);
 
-        this.addPossibleMove(board, piece, newKingSquare, moveCastle, moves, false);
+        this.addPossibleMove(board, piece, newKingSquare, moveCastle, moves, false, verifyingCheck);
       }
 
       return moves;
@@ -74,7 +69,7 @@ public enum PieceType {
       HashMap<Square, Move> moves = new HashMap<>();
 
       for (Direction direction : Direction.values()) {
-        this.addDirection(board, piece, direction, moves);
+        this.addDirection(board, piece, direction, moves, verifyingCheck);
       }
 
       return moves;
@@ -93,8 +88,10 @@ public enum PieceType {
 
         // u make 8 L shapes by offsetting 1 in every cardinal direction,
         // then diagonal clockwise/counterclockwise
-        this.addPossibleMove(board, piece, up.offset(direction.rotateClockwise()), moves);
-        this.addPossibleMove(board, piece, up.offset(direction.rotateCounterClockwise()), moves);
+        this.addPossibleMove(
+            board, piece, up.offset(direction.rotateClockwise()), moves, verifyingCheck);
+        this.addPossibleMove(
+            board, piece, up.offset(direction.rotateCounterClockwise()), moves, verifyingCheck);
       }
 
       return moves;
@@ -108,7 +105,7 @@ public enum PieceType {
       for (Direction direction : Direction.values()) {
         if (direction.isDiagonal()) continue;
 
-        this.addDirection(board, piece, direction, moves);
+        this.addDirection(board, piece, direction, moves, verifyingCheck);
       }
 
       return moves;
@@ -122,7 +119,7 @@ public enum PieceType {
       for (Direction direction : Direction.values()) {
         if (!direction.isDiagonal()) continue;
 
-        this.addDirection(board, piece, direction, moves);
+        this.addDirection(board, piece, direction, moves, verifyingCheck);
       }
 
       return moves;
@@ -139,7 +136,8 @@ public enum PieceType {
       // pawns move 1 forward!
       // because they blow all their strength on the first move
       for (int i = 1; i <= pawnDistance; i++) {
-        this.addPossibleMove(board, piece, piece.position.offset(direction, i), null, moves, false);
+        this.addPossibleMove(
+            board, piece, piece.position.offset(direction, i), null, moves, false, verifyingCheck);
       }
 
       // en passant, when a pawns last move was 2 forward,
@@ -161,7 +159,8 @@ public enum PieceType {
             square.offset(direction),
             () -> Move.killPiece(board, enPassantPiece),
             moves,
-            true);
+            true,
+            verifyingCheck);
       }
 
       // taking normally
@@ -169,7 +168,7 @@ public enum PieceType {
           new Direction[] {direction.rotateClockwise(), direction.rotateCounterClockwise()}) {
         Square square = piece.position.offset(d);
         if (board.notContainsEnemy(piece, square)) continue;
-        this.addPossibleMove(board, piece, square, moves);
+        this.addPossibleMove(board, piece, square, moves, verifyingCheck);
       }
 
       return moves;
@@ -207,8 +206,13 @@ public enum PieceType {
       Board board, Piece piece, boolean verifyingCheck);
 
   protected boolean addPossibleMove(
-      Board board, Piece piece, Square finalPosition, HashMap<Square, Move> possibleMoves) {
-    return this.addPossibleMove(board, piece, finalPosition, null, possibleMoves, true);
+      Board board,
+      Piece piece,
+      Square finalPosition,
+      HashMap<Square, Move> possibleMoves,
+      boolean verifyingCheck) {
+    return this.addPossibleMove(
+        board, piece, finalPosition, null, possibleMoves, true, verifyingCheck);
   }
 
   // the "canCapture" param is ONLY used for pawns.
@@ -219,7 +223,14 @@ public enum PieceType {
       Square finalPosition,
       Runnable targetAction,
       HashMap<Square, Move> possibleMoves,
-      boolean canCapture) {
+      boolean canCapture,
+      boolean verifyingCheck) {
+    // moving to a position containing check is ILLEGAL
+    // although my father never taught me this
+    // games often ended by me not realising i was in check.
+    Piece king = board.getTeam(piece.colour).king;
+    if (king.wouldCheck(piece, finalPosition, board, verifyingCheck)) return false;
+
     if (finalPosition.isInvalidSquare(board.pieces) || board.containsFriend(piece, finalPosition))
       return false;
 
@@ -238,10 +249,14 @@ public enum PieceType {
   /// adds a direction with INFINITE range, cause queens, horses, and bishops are just built
   /// different
   protected void addDirection(
-      Board board, Piece piece, Direction direction, HashMap<Square, Move> moves) {
+      Board board,
+      Piece piece,
+      Direction direction,
+      HashMap<Square, Move> moves,
+      boolean verifyingCheck) {
     Square nextPosition = piece.position;
     while (this.addPossibleMove(
-        board, piece, nextPosition = nextPosition.offset(direction), moves)) {
+        board, piece, nextPosition = nextPosition.offset(direction), moves, verifyingCheck)) {
       // we can take 1 piece, but not the piece behind.
       if (board.pieces[nextPosition.x()][nextPosition.y()] != null) break;
     }

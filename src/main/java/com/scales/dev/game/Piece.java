@@ -25,20 +25,21 @@ public class Piece {
     type.draw(g, size, colour);
   }
 
-  public boolean wouldCheck(Square targetSquare, Board board, boolean verifyingCheck) {
+  public boolean wouldCheck(
+      Piece movingPiece, Square targetSquare, Board board, boolean verifyingCheck) {
     if (verifyingCheck || targetSquare.isInvalidSquare(board.pieces)) return false;
 
     Piece pieceAtTarget = board.getPiece(targetSquare);
     // requires simulating the board at the new position
     // because some pieces *cough pawns* gain new options
     // also the king could be body blocking a square himself
-    board.pieces[this.position.x()][this.position.y()] = null;
-    board.pieces[targetSquare.x()][targetSquare.y()] = this;
+    board.pieces[movingPiece.position.x()][movingPiece.position.y()] = null;
+    board.pieces[targetSquare.x()][targetSquare.y()] = movingPiece;
 
-    boolean isChecked = this.isChecked(targetSquare, board);
+    boolean isChecked = this.isChecked(movingPiece == this ? targetSquare : this.position, board);
 
     // undo!
-    board.pieces[this.position.x()][this.position.y()] = this;
+    board.pieces[movingPiece.position.x()][movingPiece.position.y()] = movingPiece;
     board.pieces[targetSquare.x()][targetSquare.y()] = pieceAtTarget;
 
     return isChecked;
